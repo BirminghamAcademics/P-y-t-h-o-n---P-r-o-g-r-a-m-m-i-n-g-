@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request, render_template
+from models import init_db, add_high_score, get_high_scores
 
 app = Flask(__name__)
 
-# In-memory high score list
-high_scores = []
+# Initialize database
+init_db()
 
 @app.route('/')
 def home():
@@ -16,10 +17,9 @@ def highscore():
         name = data.get('name')
         score = data.get('score')
         if name and score:
-            high_scores.append({'name': name, 'score': score})
-            high_scores.sort(key=lambda x: x['score'], reverse=True)
-            return jsonify({'status': 'success', 'high_scores': high_scores[:10]})
-    return jsonify({'high_scores': high_scores[:10]})
+            add_high_score(name, score)
+            return jsonify({'status': 'success', 'high_scores': get_high_scores()})
+    return jsonify({'high_scores': get_high_scores()})
 
 if __name__ == '__main__':
     app.run(debug=True)
